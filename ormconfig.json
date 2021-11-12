@@ -7,6 +7,7 @@
   "host": "localhost",
   "port": 5432,
   "database": "fin_api",
+  "synchronize": false,
   "entities": [
     "./src/modules/**/entities/*.ts"
   ],

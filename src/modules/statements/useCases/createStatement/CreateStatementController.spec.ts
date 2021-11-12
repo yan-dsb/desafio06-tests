@@ -12,6 +12,12 @@ describe('Create Statement', () => {
     connection =  await createConnection();
     await connection.runMigrations();
 
+    await request(app).post('/api/v1/users').send({
+      name: 'test',
+      email: 'teststatementcreate@example.com',
+      password: 'test'
+    });
+
   });
 
   afterAll( async ()=> {
@@ -23,14 +29,9 @@ describe('Create Statement', () => {
 
   it('should be able to create a new statement of type deposit', async ()=> {
 
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'teststatementcreate@example.com',
       password: 'test'
     });
 
@@ -51,14 +52,8 @@ describe('Create Statement', () => {
 
   it('should be able to create a new statement of type withdraw', async ()=> {
 
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
-
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'teststatementcreate@example.com',
       password: 'test'
     });
 
@@ -77,16 +72,33 @@ describe('Create Statement', () => {
 
   });
 
-  it('should not be able to create a new statement to non-existent user', async ()=> {
+  it('should not be able to create a new statement of type withdraw, user has insufficient funds', async ()=> {
 
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
+
+    const responseToken = await request(app).post('/api/v1/sessions').send({
+      email: 'teststatementcreate@example.com',
       password: 'test'
     });
 
+    const { token } = responseToken.body;
+
+    const response = await request(app).post('/api/v1/statements/withdraw').send({
+      amount: 150,
+      description: 'test'
+    }).set({
+      Authorization: `Bearer ${token}`
+    });
+
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty('message');
+
+  });
+
+  it('should not be able to create a new statement to non-existent user', async ()=> {
+
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'teststatementcreate@example.com',
       password: 'test'
     });
 
@@ -104,34 +116,6 @@ describe('Create Statement', () => {
 
 
     expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('message');
-
-  });
-
-  it('should not be able to create a new statement of type withdraw, user has insufficient funds', async ()=> {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
-
-    const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
-      password: 'test'
-    });
-
-    const { token, user } = responseToken.body;
-
-    const response = await request(app).post('/api/v1/statements/withdraw').send({
-      amount: 100,
-      description: 'test'
-    }).set({
-      Authorization: `Bearer ${token}`
-    });
-
-
-    expect(response.status).toBe(400);
     expect(response.body).toHaveProperty('message');
 
   });

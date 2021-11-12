@@ -12,6 +12,12 @@ describe('Get Balance', () => {
     connection =  await createConnection();
     await connection.runMigrations();
 
+    await request(app).post('/api/v1/users').send({
+      name: 'test',
+      email: 'test@example.com',
+      password: 'test'
+    });
+
   });
 
   afterAll( async ()=> {
@@ -23,12 +29,6 @@ describe('Get Balance', () => {
 
 
   it('should be able to get user balance', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
       email: 'test@example.com',
@@ -49,12 +49,6 @@ describe('Get Balance', () => {
   });
 
   it('should not be able to get an non-existent user balance', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
       email: 'test@example.com',

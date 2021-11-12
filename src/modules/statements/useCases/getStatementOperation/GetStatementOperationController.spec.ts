@@ -13,6 +13,12 @@ describe('Get Statement Operation', () => {
     connection =  await createConnection();
     await connection.runMigrations();
 
+    await request(app).post('/api/v1/users').send({
+      name: 'test',
+      email: 'teststatementget@example.com',
+      password: 'test'
+    });
+
   });
 
   afterAll( async ()=> {
@@ -22,18 +28,10 @@ describe('Get Statement Operation', () => {
 
   });
 
-
   it('should be able to get user statement operation', async () => {
 
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
-
-
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'teststatementget@example.com',
       password: 'test'
     });
 
@@ -57,16 +55,32 @@ describe('Get Statement Operation', () => {
 
   });
 
-  it('should not be able to get statement operation, user does not exists', async () => {
 
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
+  it('should not be able to get non-existent user statement operation', async () => {
+
+
+    const responseToken = await request(app).post('/api/v1/sessions').send({
+      email: 'teststatementget@example.com',
       password: 'test'
     });
 
+    const { token } = responseToken.body;
+
+    const non_existing_statement_uuid = uuidv4();
+
+    const response = await request(app).get(`/api/v1/statements/${non_existing_statement_uuid}`).set({
+      Authorization: `Bearer ${token}`
+    });
+
+    expect(response.status).toBe(404);
+    expect(response.body).toHaveProperty('message');
+
+  });
+
+  it('should not be able to get statement operation, user does not exists', async () => {
+
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'teststatementget@example.com',
       password: 'test'
     });
 
@@ -87,32 +101,6 @@ describe('Get Statement Operation', () => {
       Authorization: `Bearer ${token}`
     });
 
-
-    expect(response.status).toBe(404);
-    expect(response.body).toHaveProperty('message');
-
-  });
-
-  it('should not be able to get non-existent user statement operation', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
-
-    const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
-      password: 'test'
-    });
-
-    const { token } = responseToken.body;
-
-    const non_existing_statement_uuid = uuidv4();
-
-    const response = await request(app).get(`/api/v1/statements/${non_existing_statement_uuid}`).set({
-      Authorization: `Bearer ${token}`
-    });
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty('message');

@@ -25,7 +25,7 @@ describe('Create User', ()=> {
 
     const response = await request(app).post('/api/v1/users').send({
       name: 'test',
-      email: 'test@example.com',
+      email: 'testuser@example.com',
       password: 'test'
     });
 
@@ -37,13 +37,13 @@ describe('Create User', ()=> {
 
     await request(app).post('/api/v1/users').send({
       name: 'test',
-      email: 'test@example.com',
+      email: 'testuser@example.com',
       password: 'test'
     });
 
     const response = await request(app).post('/api/v1/users').send({
       name: 'test',
-      email: 'test@example.com',
+      email: 'testuser@example.com',
       password: 'test'
     });
 

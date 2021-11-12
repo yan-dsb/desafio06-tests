@@ -11,6 +11,12 @@ describe('Authenticate User', ()=> {
     connection =  await createConnection();
     await connection.runMigrations();
 
+    await request(app).post('/api/v1/users').send({
+      name: 'test',
+      email: 'test@example.com',
+      password: 'test'
+    });
+
   });
 
   afterAll( async ()=> {
@@ -21,12 +27,6 @@ describe('Authenticate User', ()=> {
   });
 
   it('should be able to authenticate a user', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const response = await request(app).post('/api/v1/sessions').send({
       email: 'test@example.com',

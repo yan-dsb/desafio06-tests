@@ -12,6 +12,12 @@ describe('Show User Profile', () => {
     connection =  await createConnection();
     await connection.runMigrations();
 
+    await request(app).post('/api/v1/users').send({
+      name: 'test',
+      email: 'test@example.com',
+      password: 'test'
+    });
+
   });
 
   afterAll( async ()=> {
@@ -22,12 +28,6 @@ describe('Show User Profile', () => {
   });
 
   it('should be able to show a user profile', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
       email: 'test@example.com',
@@ -48,12 +48,6 @@ describe('Show User Profile', () => {
   });
 
   it('should be able to show an non-existent user profile, user deleted', async () => {
-
-    await request(app).post('/api/v1/users').send({
-      name: 'test',
-      email: 'test@example.com',
-      password: 'test'
-    });
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
       email: 'test@example.com',
