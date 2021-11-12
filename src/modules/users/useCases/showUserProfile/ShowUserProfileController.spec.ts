@@ -14,7 +14,7 @@ describe('Show User Profile', () => {
 
     await request(app).post('/api/v1/users').send({
       name: 'test',
-      email: 'test@example.com',
+      email: 'testprofile@example.com',
       password: 'test'
     });
 
@@ -30,7 +30,7 @@ describe('Show User Profile', () => {
   it('should be able to show a user profile', async () => {
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'testprofile@example.com',
       password: 'test'
     });
 
@@ -50,7 +50,7 @@ describe('Show User Profile', () => {
   it('should be able to show an non-existent user profile, user deleted', async () => {
 
     const responseToken = await request(app).post('/api/v1/sessions').send({
-      email: 'test@example.com',
+      email: 'testprofile@example.com',
       password: 'test'
     });
 
